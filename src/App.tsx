@@ -1,11 +1,10 @@
-import { useEffect } from "react";
-import Lenis from "lenis";
+import { useEffect, Suspense } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
 
-import { ThemeProvider } from "./context/ThemeContext";
-import ParticleBackground from "./components/ParticleBackground";
-import MouseGlow from "./components/MouseGlow";
+import ThreeScene from "./components/ThreeScene";
+import CustomCursor from "./components/CustomCursor";
 import Navigation from "./sections/Navigation";
 import Hero from "./sections/Hero";
 import About from "./sections/About";
@@ -19,46 +18,34 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   useEffect(() => {
-    const lenis = new Lenis({
-      lerp: 0.08,
-      duration: 1.2,
-    });
-
+    const lenis = new Lenis({ lerp: 0.08, duration: 1.2 });
     lenis.on("scroll", ScrollTrigger.update);
-
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      lenis.destroy();
-    };
+    return () => { lenis.destroy(); };
   }, []);
 
   return (
-    <ThemeProvider>
-      <div
-        className="relative"
-        style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh" }}
-      >
-        {/* Animated Background Layers */}
-        <ParticleBackground />
-        <MouseGlow />
+    <div style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh", cursor: "none" }}>
+      {/* 3D Background Scene */}
+      <Suspense fallback={null}>
+        <ThreeScene />
+      </Suspense>
 
-        {/* Content */}
-        <div className="relative" style={{ zIndex: 10 }}>
-          <Navigation />
-          <Hero />
-          <About />
-          <Experience />
-          <Skills />
-          <Projects />
-          <Education />
-          <Contact />
-        </div>
+      {/* Custom Cursor */}
+      <CustomCursor />
+
+      {/* Page Content */}
+      <div className="relative" style={{ zIndex: 10 }}>
+        <Navigation />
+        <Hero />
+        <About />
+        <Experience />
+        <Skills />
+        <Projects />
+        <Education />
+        <Contact />
       </div>
-    </ThemeProvider>
+    </div>
   );
 }

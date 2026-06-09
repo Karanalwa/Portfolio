@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import TiltCard from "../components/TiltCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -66,70 +65,100 @@ const skillCategories = [
   },
 ];
 
-export default function Skills() {
+function SkillCard3D({ cat, index }: { cat: typeof skillCategories[0]; index: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
   const barsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
+    if (!cardRef.current) return;
+    const card = cardRef.current;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+      const y = ((e.clientY - rect.top) / rect.height - 0.5) * -8;
+      card.style.transform = `perspective(1000px) rotateX(${y}deg) rotateY(${x}deg) translateZ(5px)`;
+    };
+    const handleMouseLeave = () => {
+      card.style.transform = "perspective(1000px) rotateX(0) rotateY(0) translateZ(0)";
+    };
+    card.addEventListener("mousemove", handleMouseMove);
+    card.addEventListener("mouseleave", handleMouseLeave);
+
+    // Animate skill bars
     barsRef.current.forEach((bar) => {
       if (!bar) return;
-      const targetWidth = bar.getAttribute("data-width");
-      gsap.fromTo(bar,
-        { width: "0%" },
-        { width: targetWidth + "%", duration: 1.2, ease: "power2.out",
-          scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" }
-        }
-      );
+      const target = bar.getAttribute("data-width");
+      gsap.fromTo(bar, { width: "0%" }, {
+        width: target + "%", duration: 1.2, ease: "power2.out",
+        scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" },
+      });
     });
+
+    return () => { card.removeEventListener("mousemove", handleMouseMove); card.removeEventListener("mouseleave", handleMouseLeave); };
   }, []);
 
-  let barIndex = 0;
-
   return (
-    <section id="skills" className="px-4 sm:px-6 lg:px-10 py-20 sm:py-24 lg:py-32" style={{ backgroundColor: "var(--bg-secondary)" }}>
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, rotateY: -25, x: -40 }}
+      whileInView={{ opacity: 1, rotateY: 0, x: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      style={{
+        padding: "24px",
+        backgroundColor: "var(--bg-card)",
+        border: "1px solid var(--border)",
+        borderRadius: "14px",
+        transformStyle: "preserve-3d",
+        transition: "transform 0.15s ease-out, box-shadow 0.3s",
+        willChange: "transform",
+        height: "100%",
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 20px 50px rgba(193,127,78,0.12)"; e.currentTarget.style.borderColor = "var(--border-hover)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "var(--border)"; }}
+    >
+      <div className="flex items-center gap-2.5 mb-5">
+        <span className="text-lg sm:text-xl">{cat.icon}</span>
+        <h3 className="font-sans font-semibold text-sm sm:text-base" style={{ color: "var(--text-primary)" }}>{cat.title}</h3>
+      </div>
+
+      <div className="flex flex-col gap-3 sm:gap-3.5">
+        {cat.skills.map((skill, si) => (
+          <div key={si}>
+            <div className="flex justify-between mb-1">
+              <span className="font-sans text-xs sm:text-sm" style={{ color: "var(--text-secondary)" }}>{skill.name}</span>
+              <span className="font-mono text-[10px] sm:text-xs" style={{ color: "var(--text-faint)" }}>{skill.level}%</span>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--input-bg)" }}>
+              <div
+                ref={(el) => { barsRef.current[si] = el; }}
+                data-width={skill.level}
+                className="h-full rounded-full"
+                style={{ width: "0%", background: "linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 50%, var(--accent) 100%)", boxShadow: "0 0 6px var(--accent-glow)" }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+export default function Skills() {
+  return (
+    <section id="skills" className="px-4 sm:px-6 lg:px-10 py-24 lg:py-32" style={{ backgroundColor: "var(--bg-secondary)", perspective: "1200px" }}>
       <div className="mx-auto" style={{ maxWidth: "1200px" }}>
-        <motion.span initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="block font-sans font-medium uppercase mb-4" style={{ fontSize: "13px", letterSpacing: "0.1em", color: "var(--accent)" }}>
+        <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="block font-sans font-medium uppercase mb-4" style={{ fontSize: "13px", letterSpacing: "0.1em", color: "var(--accent)" }}>
           Technical Expertise
         </motion.span>
-        <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="font-sans font-bold mb-8 sm:mb-12" style={{ fontSize: "clamp(24px, 5vw, 42px)", letterSpacing: "-0.02em", lineHeight: 1.1, color: "var(--text-primary)" }}>
+        <h2 className="font-sans font-bold mb-8 sm:mb-12" style={{ fontSize: "clamp(24px, 5vw, 42px)", letterSpacing: "-0.02em", lineHeight: 1.1, color: "var(--text-primary)" }}>
           Skills & Technologies
-        </motion.h2>
+        </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5 lg:gap-6" style={{ perspective: "1000px" }}>
           {skillCategories.map((cat, ci) => (
-            <motion.div key={ci} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: ci * 0.1 }}>
-              <TiltCard tiltAmount={6} style={{ padding: "20px sm:py-6 sm:px-6 lg:px-7", backgroundColor: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: "12px", height: "100%" }}>
-                <div className="flex items-center gap-2.5 mb-4 sm:mb-5">
-                  <span className="text-lg sm:text-xl" style={{ filter: "drop-shadow(0 0 6px var(--accent-glow))" }}>{cat.icon}</span>
-                  <h3 className="font-sans font-semibold text-sm sm:text-base" style={{ color: "var(--text-primary)", letterSpacing: "0.02em" }}>{cat.title}</h3>
-                </div>
-
-                <div className="flex flex-col gap-3 sm:gap-3.5">
-                  {cat.skills.map((skill, si) => {
-                    const currentIdx = barIndex++;
-                    return (
-                      <div key={si}>
-                        <div className="flex justify-between mb-1">
-                          <span className="font-sans text-xs sm:text-sm" style={{ color: "var(--text-secondary)" }}>{skill.name}</span>
-                          <span className="font-mono text-[10px] sm:text-xs" style={{ color: "var(--text-faint)" }}>{skill.level}%</span>
-                        </div>
-                        <div className="h-1.5 sm:h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--input-bg)" }}>
-                          <div
-                            ref={(el) => { barsRef.current[currentIdx] = el; }}
-                            data-width={skill.level}
-                            className="h-full rounded-full"
-                            style={{
-                              width: "0%",
-                              background: "linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 50%, var(--accent) 100%)",
-                              boxShadow: "0 0 8px var(--accent-glow)",
-                            }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </TiltCard>
-            </motion.div>
+            <SkillCard3D key={ci} cat={cat} index={ci} />
           ))}
         </div>
       </div>
