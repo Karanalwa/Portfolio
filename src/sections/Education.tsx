@@ -1,8 +1,6 @@
 import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 
-gsap.registerPlugin(ScrollTrigger);
-
 function EduCard3D({ children, delay, rotateDir }: { children: React.ReactNode; delay: number; rotateDir: number }) {
   const cardRef = useRef<HTMLDivElement>(null);
 
