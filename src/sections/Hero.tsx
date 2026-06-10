@@ -83,8 +83,16 @@ export default function Hero() {
   const [showStats, setShowStats] = useState(false);
   const [showCta, setShowCta] = useState(false);
 
+  // Reveal the subtitle shortly after mount so the hero name is never blank on
+  // first paint (the name now renders instantly instead of typing out).
+  useEffect(() => {
+    const t = setTimeout(() => setShowSubtitle(true), 900);
+    return () => clearTimeout(t);
+  }, []);
+
   useEffect(() => {
     if (!sectionRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const ctx = gsap.context(() => {
       // Parallax scroll effect - hero content moves up faster
       gsap.to(".hero-parallax", {
@@ -122,7 +130,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0, y: 30, rotateX: -15 }}
           animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ duration: 0.7, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           style={{ perspective: "800px" }}
         >
           <h1
@@ -135,7 +143,7 @@ export default function Hero() {
               textShadow: "0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow)",
             }}
           >
-            <TypingText text="Karan Alwa" speed={80} delay={500} onComplete={() => setShowSubtitle(true)} />
+            Karan Alwa
           </h1>
         </motion.div>
 

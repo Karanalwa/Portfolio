@@ -1,4 +1,5 @@
 import { useEffect, Suspense } from "react";
+import { MotionConfig } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -19,36 +20,43 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
   useEffect(() => {
+    // Respect the user's "reduce motion" OS setting: skip smooth (inertia) scroll.
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
     const lenis = new Lenis({ lerp: 0.08, duration: 1.2 });
     lenis.on("scroll", ScrollTrigger.update);
-    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    const update = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(update);
     gsap.ticker.lagSmoothing(0);
-    return () => { lenis.destroy(); };
+    return () => { gsap.ticker.remove(update); lenis.destroy(); };
   }, []);
 
   return (
     <ThemeProvider>
-      <div style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh" }} className="cursor-default md:cursor-none">
-        {/* 3D Background Scene */}
-        <Suspense fallback={null}>
-          <ThreeScene />
-        </Suspense>
+      <MotionConfig reducedMotion="user">
+        <div style={{ backgroundColor: "var(--bg-primary)", minHeight: "100vh" }} className="cursor-default md:cursor-none">
+          {/* 3D Background Scene */}
+          <Suspense fallback={null}>
+            <ThreeScene />
+          </Suspense>
 
-        {/* Custom Cursor */}
-        <CustomCursor />
+          {/* Custom Cursor */}
+          <CustomCursor />
 
-        {/* Page Content */}
-        <div className="relative" style={{ zIndex: 10 }}>
-          <Navigation />
-          <Hero />
-          <About />
-          <Experience />
-          <Skills />
-          <Projects />
-          <Education />
-          <Contact />
+          {/* Page Content */}
+          <div className="relative" style={{ zIndex: 10 }}>
+            <Navigation />
+            <Hero />
+            <About />
+            <Experience />
+            <Skills />
+            <Projects />
+            <Education />
+            <Contact />
+          </div>
         </div>
-      </div>
+      </MotionConfig>
     </ThemeProvider>
   );
 }

@@ -193,4 +193,19 @@ button, a {
   .theme-transition {
     transition: none;
   }
+
+  /* Global safety net: neutralize CSS animations, transitions and smooth
+     scrolling for users who ask for reduced motion. JS-driven motion
+     (GSAP, Framer Motion, the typewriter) is disabled in the components. */
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

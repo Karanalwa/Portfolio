@@ -78,10 +78,13 @@ export default function Contact() {
       {/* Footer */}
       <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="relative z-10 mx-auto mt-16 sm:mt-20 pt-6 sm:pt-8 px-4" style={{ maxWidth: "1200px", borderTop: "1px solid var(--border)" }}>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span className="font-mono text-[10px] sm:text-xs" style={{ color: "var(--text-faint)" }}>&copy; 2025 Karan Alwa. All rights reserved.</span>
+          <span className="font-mono text-[10px] sm:text-xs" style={{ color: "var(--text-faint)" }}>&copy; {new Date().getFullYear()} Karan Alwa. All rights reserved.</span>
           <div className="flex items-center gap-5">
-            {["LinkedIn", "GitHub"].map((label) => (
-              <motion.a key={label} href={`https://${label.toLowerCase()}.com/in/karanalwa`} target="_blank" rel="noopener noreferrer" whileHover={{ color: "var(--accent)", y: -2 }} className="font-mono text-[10px] sm:text-xs uppercase tracking-wider transition-colors duration-300" style={{ color: "var(--text-faint)", textDecoration: "none" }}>
+            {[
+              { label: "LinkedIn", href: "https://linkedin.com/in/karanalwa" },
+              { label: "GitHub", href: "https://github.com/Karanalwa" },
+            ].map(({ label, href }) => (
+              <motion.a key={label} href={href} target="_blank" rel="noopener noreferrer" whileHover={{ color: "var(--accent)", y: -2 }} className="font-mono text-[10px] sm:text-xs uppercase tracking-wider transition-colors duration-300" style={{ color: "var(--text-faint)", textDecoration: "none" }}>
                 {label}
               </motion.a>
             ))}

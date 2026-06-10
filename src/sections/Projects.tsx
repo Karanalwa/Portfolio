@@ -106,6 +106,8 @@ function ProjectCard3D({ project, index }: { project: typeof projects[0]; index:
           transition={{ duration: 0.5 }}
           src={project.image}
           alt={project.name}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, transparent 40%, var(--bg-card) 100%)" }} />
@@ -159,6 +161,7 @@ export default function Projects() {
 
   useEffect(() => {
     if (!sectionRef.current) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const ctx = gsap.context(() => {
       // 3D perspective shift on scroll
       gsap.fromTo(".projects-header",

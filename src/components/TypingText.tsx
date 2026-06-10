@@ -13,10 +13,16 @@ export default function TypingText({ text, speed = 50, delay = 0, className, sty
   const [displayed, setDisplayed] = useState("");
   const [started, setStarted] = useState(false);
 
+  // If the user prefers reduced motion, show the full text immediately.
+  const prefersReduced =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   useEffect(() => {
+    if (prefersReduced) return;
     const timer = setTimeout(() => setStarted(true), delay);
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, [delay, prefersReduced]);
 
   useEffect(() => {
     if (!started) return;
@@ -32,6 +38,19 @@ export default function TypingText({ text, speed = 50, delay = 0, className, sty
     }, speed);
     return () => clearInterval(interval);
   }, [started, text, speed, onComplete]);
+
+  // Reduced motion: render the full text instantly, no caret, but still notify.
+  useEffect(() => {
+    if (prefersReduced) onComplete?.();
+  }, [prefersReduced, onComplete]);
+
+  if (prefersReduced) {
+    return (
+      <span className={className} style={style}>
+        {text}
+      </span>
+    );
+  }
 
   return (
     <span className={className} style={style}>

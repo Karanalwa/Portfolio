@@ -5,62 +5,72 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Honest proficiency tiers instead of arbitrary self-assigned percentages.
+type Tier = "Expert" | "Proficient" | "Familiar";
+
+// Each tier maps to a fill amount for the animated bar.
+const tierWidth: Record<Tier, number> = {
+  Expert: 100,
+  Proficient: 66,
+  Familiar: 38,
+};
+
 const skillCategories = [
   {
     title: "Dynamics & Power Platform",
     icon: "\u{2699}",
     skills: [
-      { name: "Dynamics 365 CE", level: 95 },
-      { name: "Dataverse", level: 92 },
-      { name: "Model-Driven & Canvas Apps", level: 90 },
-      { name: "Power Automate", level: 93 },
-      { name: "Power Pages", level: 85 },
-      { name: "Business Process Flows", level: 88 },
+      { name: "Dynamics 365 CE", tier: "Expert" as Tier },
+      { name: "Dataverse", tier: "Expert" as Tier },
+      { name: "Model-Driven & Canvas Apps", tier: "Expert" as Tier },
+      { name: "Power Automate", tier: "Expert" as Tier },
+      { name: "Power Pages", tier: "Proficient" as Tier },
+      { name: "Business Process Flows", tier: "Proficient" as Tier },
     ],
   },
   {
     title: "Development",
     icon: "\u{1F4BB}",
     skills: [
-      { name: "C# / .NET", level: 90 },
-      { name: "Custom Plugins & Workflows", level: 92 },
-      { name: "JavaScript (Xrm/Client API)", level: 88 },
-      { name: "TypeScript", level: 80 },
-      { name: "FetchXML / OData / Web API", level: 90 },
-      { name: "Web Resources", level: 85 },
+      { name: "C# / .NET", tier: "Expert" as Tier },
+      { name: "Custom Plugins & Workflows", tier: "Expert" as Tier },
+      { name: "JavaScript (Xrm/Client API)", tier: "Proficient" as Tier },
+      { name: "TypeScript", tier: "Proficient" as Tier },
+      { name: "FetchXML / OData / Web API", tier: "Expert" as Tier },
+      { name: "Web Resources", tier: "Proficient" as Tier },
     ],
   },
   {
     title: "Integrations & Cloud",
     icon: "\u{1F310}",
     skills: [
-      { name: "REST APIs", level: 92 },
-      { name: "Azure Functions", level: 85 },
-      { name: "Azure AD / Entra ID", level: 80 },
-      { name: "QuickBooks / SevDesk / Xubio", level: 88 },
-      { name: "Business Central", level: 78 },
+      { name: "REST APIs", tier: "Expert" as Tier },
+      { name: "Azure Functions", tier: "Proficient" as Tier },
+      { name: "Azure AD / Entra ID", tier: "Proficient" as Tier },
+      { name: "QuickBooks / SevDesk / Xubio", tier: "Proficient" as Tier },
+      { name: "Business Central", tier: "Familiar" as Tier },
     ],
   },
   {
     title: "AI & Automation",
     icon: "\u{26A1}",
     skills: [
-      { name: "MCP Servers", level: 88 },
-      { name: "LLM Agent Design", level: 85 },
-      { name: "Prompt Engineering", level: 90 },
-      { name: "Anthropic Claude / OpenAI APIs", level: 85 },
-      { name: "AI Builder", level: 80 },
-      { name: "Copilot Studio", level: 78 },
+      { name: "MCP Servers", tier: "Proficient" as Tier },
+      { name: "LLM Agent Design", tier: "Proficient" as Tier },
+      { name: "Prompt Engineering", tier: "Expert" as Tier },
+      { name: "Anthropic Claude / OpenAI APIs", tier: "Proficient" as Tier },
+      { name: "AI Builder", tier: "Proficient" as Tier },
+      { name: "Copilot Studio", tier: "Familiar" as Tier },
     ],
   },
   {
     title: "DevOps & Web",
     icon: "\u{1F527}",
     skills: [
-      { name: "Solution ALM / Pipelines", level: 85 },
-      { name: "Git / Azure DevOps", level: 88 },
-      { name: "Angular", level: 75 },
-      { name: "HTML5 / CSS3", level: 90 },
+      { name: "Solution ALM / Pipelines", tier: "Proficient" as Tier },
+      { name: "Git / Azure DevOps", tier: "Proficient" as Tier },
+      { name: "Angular", tier: "Familiar" as Tier },
+      { name: "HTML5 / CSS3", tier: "Expert" as Tier },
     ],
   },
 ];
@@ -85,10 +95,15 @@ function SkillCard3D({ cat, index }: { cat: typeof skillCategories[0]; index: nu
     card.addEventListener("mousemove", handleMouseMove);
     card.addEventListener("mouseleave", handleMouseLeave);
 
-    // Animate skill bars
+    // Animate skill bars (respect reduced-motion: show final fill instantly)
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     barsRef.current.forEach((bar) => {
       if (!bar) return;
       const target = bar.getAttribute("data-width");
+      if (prefersReduced) {
+        bar.style.width = target + "%";
+        return;
+      }
       gsap.fromTo(bar, { width: "0%" }, {
         width: target + "%", duration: 1.2, ease: "power2.out",
         scrollTrigger: { trigger: bar, start: "top 90%", toggleActions: "play none none none" },
@@ -128,12 +143,12 @@ function SkillCard3D({ cat, index }: { cat: typeof skillCategories[0]; index: nu
           <div key={si}>
             <div className="flex justify-between mb-1">
               <span className="font-sans text-xs sm:text-sm" style={{ color: "var(--text-secondary)" }}>{skill.name}</span>
-              <span className="font-mono text-[10px] sm:text-xs" style={{ color: "var(--text-faint)" }}>{skill.level}%</span>
+              <span className="font-mono text-[10px] sm:text-xs uppercase tracking-wider" style={{ color: "var(--accent)" }}>{skill.tier}</span>
             </div>
             <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--input-bg)" }}>
               <div
                 ref={(el) => { barsRef.current[si] = el; }}
-                data-width={skill.level}
+                data-width={tierWidth[skill.tier]}
                 className="h-full rounded-full"
                 style={{ width: "0%", background: "linear-gradient(90deg, var(--accent) 0%, var(--accent-hover) 50%, var(--accent) 100%)", boxShadow: "0 0 6px var(--accent-glow)" }}
               />
