@@ -534,7 +534,7 @@ export default function App() {
           </div>
           <div className="kp-photo" data-rv data-rvd="100">
             <div className="frame">
-              <img src={`${IMG}/profile.jpg`} alt="Karan Alwa" />
+              <img src={`${IMG}/karan-alwa.jpg`} alt="Karan Alwa — Dynamics 365 CE & Power Platform Developer, Ahmedabad" />
               <span className="ct" /><span className="cb" />
             </div>
             <div className="cap"><span>KARAN.ALWA — AHMEDABAD, IN</span><span style={{ color: "var(--ac)" }}>FIG. 01</span></div>
