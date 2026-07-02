@@ -21,3 +21,10 @@
 ## Notes
 - Accent is now #5AD1FF (the blue you picked). Change `--ac` in App.tsx to swap.
 - Dark-only by design. Old src/sections/ files are unused — delete anytime.
+
+## Google Search Console (5 min, one time)
+1. Go to https://search.google.com/search-console → Add property → "URL prefix" → enter https://karanalwa.vercel.app/
+2. Choose the "HTML tag" verification method — copy the content token.
+3. In index.html, uncomment the google-site-verification meta and paste the token. Push.
+4. Back in Search Console click Verify, then Sitemaps → submit `sitemap.xml`.
+Indexing typically takes a few days; ranking for your name improves over weeks.
