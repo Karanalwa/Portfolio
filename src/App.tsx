@@ -16,6 +16,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 const IMG = "/images";
 
+// ── Fill these in ─────────────────────────────────────────────────────────
+const LINKS = {
+  resume: "/resume.pdf",            // drop resume.pdf into /public
+  certVerify: "https://learn.microsoft.com/api/credentials/share/en-gb/karanalwa-5134/C315F88131023F03?sharingId=8451B2C4B0C7EE83",
+};
+
 const NAV = [
   ["01", "about"],
   ["02", "build"],
@@ -55,7 +61,7 @@ const STACK = [
 const PROJECTS = [
   { name: "Hisab — POS & GST Invoicing", img: `${IMG}/project-hisab.jpg`, live: true, href: "https://hisab-9zl3.vercel.app/login", badge: "LIVE PROJECT", desc: "Complete point-of-sale and GST invoicing platform for Indian businesses — secure auth, inventory management, GST-compliant invoice generation.", tags: ["REACT", "NODE.JS", "POSTGRESQL"] },
   { name: "UNO Blitz", img: `${IMG}/project-uno.jpg`, live: true, href: "https://uno-blitz.vercel.app/", badge: "LIVE PROJECT", desc: "Real-time multiplayer UNO card game — player avatars, custom game rooms, live gameplay with a polished dark UI and smooth animations.", tags: ["REACT", "TYPESCRIPT", "WEBSOCKET"] },
-  { name: "MCP Server for Dynamics 365 CRM", img: `${IMG}/project-2.jpg`, live: false, badge: "CRM-TO-AI BRIDGE", glyph: "⌘", desc: "MCP server exposing D365 entities and operations as tools consumable by LLM clients like Claude and Copilot — scoped permissions, secure auth.", tags: ["MCP", "D365 WEB API"] },
+  { name: "MCP Server for Dynamics 365 CRM", img: `${IMG}/project-2.jpg`, live: false, priv: true, badge: "CRM-TO-AI BRIDGE", glyph: "⌘", desc: "MCP server exposing D365 entities and operations as tools consumable by LLM clients like Claude and Copilot — scoped permissions, secure auth.", tags: ["MCP", "D365 WEB API"] },
   { name: "Sales Validation AI Agent", img: `${IMG}/project-6.jpg`, live: false, badge: "35% FEWER INVALID", glyph: "⚡", desc: "AI agent validating quotes against pricing tiers and discount policies — integrated with Power Automate to auto-flag invalid records.", tags: ["LLM AGENT", "D365", "POWER AUTOMATE"] },
   { name: "Prexa365 — Rental Management", img: `${IMG}/project-1.jpg`, live: false, badge: "30% EFFORT CUT", glyph: "▣", desc: "End-to-end rental modules with complex pricing/tax logic and integrations to 4 accounting systems.", tags: ["D365 CE", "C# PLUGINS", "POWER AUTOMATE"] },
   { name: "Transport Bidding & Booking", img: `${IMG}/project-5.jpg`, live: false, badge: "REAL-TIME PROCESSING", glyph: "⇄", desc: "Power Pages portals integrated with Dataverse — real-time bid submission, quote management, rental bookings with automated approvals.", tags: ["POWER PAGES", "ANGULAR", "D365 CE"] },
@@ -81,7 +87,7 @@ const ROLES = [
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 .kp{
-  --ac:#3DF2B6;
+  --ac:#5AD1FF;
   --bg:#06090D; --panel:#080C11; --ink:#E7EEF2; --mut:#93A1AB; --dim:#A6B4BD; --faint:#6B7A85;
   --line:rgba(231,238,242,.1); --line2:rgba(231,238,242,.14);
   --mono:'JetBrains Mono',ui-monospace,monospace; --sans:'Space Grotesk',system-ui,sans-serif;
@@ -108,7 +114,7 @@ const CSS = `
 .kp-lnk{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--mut);transition:color .2s}
 .kp-lnk:hover{color:var(--ink)}
 .kp-lnk b{color:var(--ac);font-weight:400}
-.kp-cta{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ac);border:1px solid color-mix(in oklab,var(--ac) 45%,transparent);padding:8px 14px;border-radius:999px;transition:all .2s}
+.kp-cta{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ac);border:1px solid color-mix(in oklab,var(--ac) 45%,transparent);padding:8px 14px;border-radius:999px;transition:all .2s;white-space:nowrap}
 .kp-cta:hover{background:var(--ac);color:var(--bg)}
 .kp-burger{display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:42px;height:42px;background:none;border:1px solid var(--line2);border-radius:8px;cursor:pointer;padding:0}
 .kp-burger span{display:block;width:18px;height:2px;background:var(--ink);transition:transform .25s,opacity .25s}
@@ -139,7 +145,7 @@ const CSS = `
 .kp-hud .tr{top:0;right:0;border-top:1px solid rgba(231,238,242,.3);border-right:1px solid rgba(231,238,242,.3)}
 .kp-hud .bl{bottom:0;left:0;border-bottom:1px solid rgba(231,238,242,.3);border-left:1px solid rgba(231,238,242,.3)}
 .kp-hud .br{bottom:0;right:0;border-bottom:1px solid rgba(231,238,242,.3);border-right:1px solid rgba(231,238,242,.3)}
-.kp-badge{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--ac);border:1px solid color-mix(in oklab,var(--ac) 35%,transparent);background:color-mix(in oklab,var(--ac) 7%,transparent);padding:8px 15px;border-radius:999px}
+.kp-badge{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--ac);border:1px solid color-mix(in oklab,var(--ac) 35%,transparent);background:color-mix(in oklab,var(--ac) 7%,transparent);padding:8px 15px;border-radius:999px;white-space:nowrap}
 .kp-dot{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:kpPulse 2s ease-in-out infinite}
 .kp-h1{margin:0;font-size:clamp(54px,12.5vw,162px);font-weight:700;line-height:.92;letter-spacing:-.045em;text-transform:uppercase;text-align:center}
 .kp-h1 .w{display:inline-block;white-space:nowrap}
@@ -595,14 +601,15 @@ export default function App() {
                   <div className="body">
                     <div className="top">
                       <h3>{p.name}</h3>
-                      {p.live
+                      {p.href
                         ? <a className="arw" href={p.href} target="_blank" rel="noopener noreferrer">↗</a>
                         : <span className="arw">{p.glyph}</span>}
                     </div>
                     <p>{p.desc}</p>
                     <div className="tags">
                       {p.tags.map((t) => <span className="kp-tag" key={t}>{t}</span>)}
-                      {p.live && <a className="kp-open" href={p.href} target="_blank" rel="noopener noreferrer">OPEN ↗</a>}
+                      {p.href && <a className="kp-open" href={p.href} target="_blank" rel="noopener noreferrer">{p.linkLabel || "OPEN ↗"}</a>}
+                      {p.priv && <span className="kp-tag" style={{ borderStyle: "dashed", color: "var(--faint)" }}>PRIVATE REPO</span>}
                     </div>
                   </div>
                 </article>
@@ -643,6 +650,7 @@ export default function App() {
               <h3>PL-400 · Power Platform Developer Associate</h3>
               <p>Custom development on the Power Platform — plugins, custom APIs, Power Automate and Dataverse.</p>
               <span className="kp-pill"><span className="kp-dot" style={{ width: 5, height: 5 }} />ACTIVE</span>
+              {LINKS.certVerify && <a href={LINKS.certVerify} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 12, fontFamily: "var(--mono)", fontSize: 10, letterSpacing: ".18em", color: "var(--ac)", borderBottom: "1px solid color-mix(in oklab, var(--ac) 50%, transparent)", paddingBottom: 2 }}>VERIFY CREDENTIAL ↗</a>}
             </div>
             <div className="kp-edu" data-rv data-rvd="90">
               <div className="k">EDUCATION</div>
@@ -673,6 +681,7 @@ export default function App() {
           <div data-rv data-rvd="160" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12 }}>
             <a className="kp-soc" href="https://linkedin.com/in/karanalwa" target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a>
             <a className="kp-soc" href="https://github.com/Karanalwa" target="_blank" rel="noopener noreferrer">GITHUB ↗</a>
+            <a className="kp-soc" href={LINKS.resume} download>RESUME ↓</a>
             <a className="kp-soc" href="tel:+919300594844">+91 93005 94844</a>
             <span className="kp-soc ghost">AHMEDABAD · INDIA</span>
           </div>

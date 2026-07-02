@@ -1,73 +1,23 @@
-# React + TypeScript + Vite
+# Portfolio v2 — apply to your local repo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 1. Replace / add these files
+- `src/App.tsx`  → overwrite
+- `index.html`   → overwrite (new favicon, theme color, fonts, same SEO)
+- `public/images/og-image.jpg` → overwrite (new v2 social preview)
+- `public/resume.pdf` → ADD YOUR RESUME (the RESUME button points here)
 
-Currently, two official plugins are available:
+## 2. Fill in two links (top of src/App.tsx, `LINKS` const)
+- `certVerify` — your Credly / Microsoft Learn credential URL
+- `mcpRepo`    — your MCP server GitHub repo (currently your profile)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 3. Preview
+    npm run dev
 
-## React Compiler
+## 4. Push
+    git add src/App.tsx index.html public/images/og-image.jpg public/resume.pdf
+    git commit -m "Portfolio v2 — resume, cert verify, MCP link, new brand meta"
+    git push origin main
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Notes
+- Accent is now #5AD1FF (the blue you picked). Change `--ac` in App.tsx to swap.
+- Dark-only by design. Old src/sections/ files are unused — delete anytime.
