@@ -7,7 +7,7 @@
 //  `npm run dev` to preview → commit → push.
 //  Accent color: change --ac in the CSS block below.
 // ============================================================================
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -110,6 +110,22 @@ const CSS = `
 .kp-lnk b{color:var(--ac);font-weight:400}
 .kp-cta{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--ac);border:1px solid color-mix(in oklab,var(--ac) 45%,transparent);padding:8px 14px;border-radius:999px;transition:all .2s}
 .kp-cta:hover{background:var(--ac);color:var(--bg)}
+.kp-burger{display:none;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:42px;height:42px;background:none;border:1px solid var(--line2);border-radius:8px;cursor:pointer;padding:0}
+.kp-burger span{display:block;width:18px;height:2px;background:var(--ink);transition:transform .25s,opacity .25s}
+.kp-burger.on span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.kp-burger.on span:nth-child(2){opacity:0}
+.kp-burger.on span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.kp-menu{position:fixed;inset:0;z-index:79;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;background:rgba(6,9,13,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.kp-menu .m-lnk{font-family:var(--mono);font-size:16px;letter-spacing:.18em;color:var(--ink)}
+.kp-menu .m-lnk b{color:var(--ac);font-weight:400;font-size:11px;margin-right:10px}
+@media(max-width:820px){.kp-links{display:none}.kp-burger{display:flex}}
+@media(max-width:640px){
+  .kp-hud .toplab{display:none}
+  .kp-hero{padding:104px 18px 76px}
+  .kp-work-pin{gap:24px}
+  .kp-h2{margin:22px 0 34px}
+  .kp-photo{justify-self:center}
+}
 
 .kp-hero{position:relative;min-height:100svh;display:grid;place-items:center;overflow:clip;padding:130px 24px 90px}
 .kp-dots{position:absolute;inset:0;background-image:radial-gradient(rgba(231,238,242,.07) 1px,transparent 1px),radial-gradient(rgba(231,238,242,.035) 1px,transparent 1px);background-size:28px 28px,140px 140px;-webkit-mask-image:radial-gradient(ellipse 90% 80% at 50% 45%,#000 30%,transparent 100%);mask-image:radial-gradient(ellipse 90% 80% at 50% 45%,#000 30%,transparent 100%)}
@@ -190,7 +206,7 @@ const CSS = `
 .kp-work-pin{min-height:100svh;display:flex;flex-direction:column;justify-content:center;gap:34px;overflow:clip;padding:70px 0}
 .kp-work-head{max-width:1240px;width:100%;margin:0 auto;padding:0 clamp(20px,5vw,64px)}
 .kp-track{display:flex;gap:clamp(18px,2.6vw,32px);padding:0 clamp(20px,5vw,64px);width:max-content;will-change:transform;align-items:stretch}
-.kp-proj{width:clamp(300px,64vw,620px);border:1px solid rgba(231,238,242,.12);border-radius:16px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;transition:border-color .3s,transform .3s;flex:0 0 auto}
+.kp-proj{width:min(86vw,620px);border:1px solid rgba(231,238,242,.12);border-radius:16px;background:var(--panel);overflow:hidden;display:flex;flex-direction:column;transition:border-color .3s,transform .3s;flex:0 0 auto}
 .kp-proj:hover{border-color:color-mix(in oklab,var(--ac) 50%,transparent);transform:translateY(-4px)}
 .kp-proj .shot{position:relative;width:100%;aspect-ratio:16/9;background:rgba(231,238,242,.04);border-bottom:1px solid rgba(231,238,242,.08)}
 .kp-proj .shot img{width:100%;height:100%;object-fit:cover}
@@ -205,7 +221,7 @@ const CSS = `
 .kp-proj .tags{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:auto}
 .kp-open{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;padding:5px 9px;border:1px solid color-mix(in oklab,var(--ac) 45%,transparent);border-radius:4px;color:var(--ac);transition:all .2s}
 .kp-open:hover{background:var(--ac);color:var(--bg)}
-.kp-next{width:clamp(260px,44vw,440px);border:1px dashed color-mix(in oklab,var(--ac) 40%,transparent);border-radius:16px;background:color-mix(in oklab,var(--ac) 4%,var(--bg));display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:16px;padding:clamp(28px,4vw,48px);flex:0 0 auto}
+.kp-next{width:min(70vw,440px);border:1px dashed color-mix(in oklab,var(--ac) 40%,transparent);border-radius:16px;background:color-mix(in oklab,var(--ac) 4%,var(--bg));display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:16px;padding:clamp(28px,4vw,48px);flex:0 0 auto}
 .kp-next .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;color:var(--ac)}
 .kp-next h3{margin:0;font-size:clamp(26px,3.4vw,40px);font-weight:600;letter-spacing:-.02em;line-height:1.1}
 
@@ -264,8 +280,15 @@ export default function App() {
   const tline = useRef(null);
   const lenisRef = useRef(null);
   const reducedRef = useRef(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   const scrollToId = (id) => {
+    setMenuOpen(false);
     const el = document.getElementById(id);
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY - 60;
@@ -424,7 +447,19 @@ export default function App() {
           ))}
           <a className="kp-cta" href="#contact" onClick={(e) => { e.preventDefault(); scrollToId("contact"); }}>GET IN TOUCH</a>
         </div>
+        <button className={"kp-burger" + (menuOpen ? " on" : "")} aria-label="Menu" onClick={() => setMenuOpen((o) => !o)}>
+          <span /><span /><span />
+        </button>
       </nav>
+
+      {menuOpen && (
+        <div className="kp-menu">
+          {NAV.map(([n, id]) => (
+            <a key={id} className="m-lnk" href={`#${id}`} onClick={(e) => { e.preventDefault(); scrollToId(id); }}><b>{n}</b>{id.toUpperCase()}</a>
+          ))}
+          <a className="kp-cta" href="#contact" style={{ marginTop: 8 }} onClick={(e) => { e.preventDefault(); scrollToId("contact"); }}>GET IN TOUCH</a>
+        </div>
+      )}
 
       {/* HERO */}
       <header id="hero" className="kp-hero" data-screen-label="Hero">
@@ -435,8 +470,8 @@ export default function App() {
         <div className="kp-scan" />
         <div className="kp-hud">
           <span className="c tl" /><span className="c tr" /><span className="c bl" /><span className="c br" />
-          <span style={{ position: "absolute", top: 70, left: 26 }}>PORTFOLIO — 2026 EDITION</span>
-          <span style={{ position: "absolute", top: 70, right: 26, textAlign: "right" }}>AHMEDABAD · INDIA</span>
+          <span className="toplab" style={{ position: "absolute", top: 70, left: 26 }}>PORTFOLIO — 2026 EDITION</span>
+          <span className="toplab" style={{ position: "absolute", top: 70, right: 26, textAlign: "right" }}>AHMEDABAD · INDIA</span>
           <span style={{ position: "absolute", bottom: 22, left: 26, animation: "kpPulse 2.6s ease-in-out infinite" }}>SCROLL TO EXPLORE ↓</span>
           <span style={{ position: "absolute", bottom: 22, right: 26, color: "var(--ac)" }}>PL-400 CERTIFIED</span>
         </div>
@@ -454,7 +489,7 @@ export default function App() {
             <a className="kp-btn" href="#work" onClick={(e) => { e.preventDefault(); scrollToId("work"); }}>VIEW SELECTED WORK</a>
             <a className="kp-btn2" href="#about" onClick={(e) => { e.preventDefault(); scrollToId("about"); }}>MORE ABOUT ME</a>
           </div>
-          <div data-rv data-rvd="200" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px 44px", marginTop: 10 }}>
+          <div data-rv data-rvd="200" style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "12px clamp(20px, 6vw, 44px)", marginTop: 10 }}>
             {STATS.map(([n, s, l]) => (
               <div className="kp-stat" key={l}>
                 <span className="n"><span data-count={n} data-suffix={s}>{n}{s}</span></span>
